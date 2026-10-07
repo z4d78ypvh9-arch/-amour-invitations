@@ -1,0 +1,3 @@
+const f=document.querySelector("#form"),result=document.querySelector("#result"),url=document.querySelector("#url");f.date.value=new Date().toISOString().slice(0,10);f.date.min=f.date.value;
+f.onsubmit=async e=>{e.preventDefault();const r=await fetch("/api/invitations",{method:"POST",body:new FormData(f)});const d=await r.json();if(!r.ok)return alert(d.error||"Ошибка");url.value=d.url;document.querySelector("#open").href=d.url;result.classList.remove("hidden");result.scrollIntoView({behavior:"smooth"})};
+document.querySelector("#copy").onclick=async()=>{await navigator.clipboard.writeText(url.value);document.querySelector("#status").textContent="Скопировано ♥"};

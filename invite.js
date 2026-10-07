@@ -1,0 +1,8 @@
+const id=location.pathname.split("/").filter(Boolean).pop(),app=document.querySelector("#app");
+const esc=s=>String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const fmt=v=>v?new Date(v+"T12:00").toLocaleDateString("ru-RU",{day:"numeric",month:"long"}):"";
+(async()=>{const r=await fetch("/api/invitations/"+id);if(!r.ok){app.innerHTML="<h1>Приглашение не найдено</h1>";return}const x=await r.json(),p=x.payload;
+app.innerHTML=`<small>♡ ДЛЯ ТЕБЯ</small>${p.photo?`<img class="invite-photo" src="${p.photo}">`:`<div class="big-heart">♥</div>`}<em>${esc(p.greeting||"Привет")}</em><h1>${esc(p.name)}</h1><p>${esc(p.message)}</p><div class="details">📅 ${esc(fmt(p.date))}<br>🕐 ${esc(p.time)}<br>📍 ${esc(p.place)}</div><div class="sign">${esc(p.author||"С любовью")}</div><button class="primary" id="yes">Да, конечно! ♥</button><button id="later">Давай позже</button><div id="answer"></div>`;
+document.querySelector("#yes").onclick=()=>send("yes");document.querySelector("#later").onclick=()=>send("later");
+async function send(a){const rr=await fetch("/api/invitations/"+id+"/answer",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({answer:a})});if(rr.ok){document.querySelector("#answer").textContent=a==="yes"?"Ура! Тогда до встречи ♥":"Хорошо, напиши, когда будешь готов(а) ♥";document.querySelector("#yes").disabled=true;document.querySelector("#later").disabled=true}}
+})()
